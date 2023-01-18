@@ -251,15 +251,6 @@ class CheckIn {
   }
 
   toString () {
-    const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
-      .map(([lottery_id, count]) => {
-        const lotteryItem = this.lotteriesTask.lottery.find(item => item.lottery_id === lottery_id);
-        if (lotteryItem) {
-          return `${lotteryItem.lottery_name}: ${count}`;
-        }
-        return `${lottery_id}: ${count}`;
-      })
-      .join("\n");
 
     return `掘友: ${this.username},访问fixbug页面成功`
   }
