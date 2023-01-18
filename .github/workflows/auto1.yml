@@ -19,7 +19,7 @@ env:
   WEIXIN_WEBHOOK: ${{ secrets.WEIXIN_WEBHOOK }}
 
 jobs:
-  CheckIn:
+  FixBug:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
