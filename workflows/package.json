@@ -6,7 +6,7 @@
   "author": "Derek Li",
   "scripts": {
     "checkin": "node checkin.js",
-    "fixbug": "node fixbug.js",
+    "fixbug": "node fixBug.js",
     "seagold": "node seagold.js"
   },
   "dependencies": {
