@@ -231,7 +231,7 @@ class MockVisitTask extends Task {
   }
 }
 
-class FixBug {
+class CheckIn {
   cookie = "";
   username = "";
 
@@ -265,7 +265,7 @@ async function run (args) {
   const cookies = utils.getUsersCookie(env);
   let messageList = [];
   for (let cookie of cookies) {
-    const checkin = new FixBug(cookie);
+    const checkin = new CheckIn(cookie);
 
     await utils.wait(utils.randomRangeNumber(1000, 5000)); // 初始等待1-5s
     await checkin.run(); // 执行
