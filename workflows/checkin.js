@@ -10,9 +10,9 @@ class Task {
 
   taskName = "";
 
-  async run() {}
+  async run () { }
 
-  toString() {
+  toString () {
     return `[${this.taskName}]`;
   }
 }
@@ -26,7 +26,7 @@ class GrowthTask extends Task {
   contCount = 0; // 连续签到天数
   sumCount = 0; // 累计签到天数
 
-  async run() {
+  async run () {
     const growth = this.juejin.growth();
 
     const todayStatus = await growth.getTodayStatus();
@@ -53,7 +53,7 @@ class DipLuckyTask extends Task {
   dipValue = 0;
   luckyValue = 0;
 
-  async run() {
+  async run () {
     const growth = this.juejin.growth();
 
     const luckyusersResult = await growth.getLotteriesLuckyUsers();
@@ -80,7 +80,7 @@ class BugfixTask extends Task {
   collectBugCount = 0;
   userOwnBug = 0;
 
-  async run() {
+  async run () {
     const bugfix = this.juejin.bugfix();
 
     const competition = await bugfix.getCompetition();
@@ -109,7 +109,7 @@ class LotteriesTask extends Task {
   lotteryCount = 0;
   luckyValueProbability = 0;
 
-  async run(growthTask, dipLuckyTask) {
+  async run (growthTask, dipLuckyTask) {
     const growth = this.juejin.growth();
 
     const lotteryConfig = await growth.getLotteryConfig();
@@ -153,7 +153,7 @@ class SdkTask extends Task {
   calledTrackGrowthEvent = false;
   calledTrackOnloadEvent = false;
 
-  async run() {
+  async run () {
     console.log("------事件埋点追踪-------");
 
     const sdk = this.juejin.sdk();
@@ -197,7 +197,7 @@ class SdkTask extends Task {
 class MockVisitTask extends Task {
   taskName = "模拟访问";
 
-  async run() {
+  async run () {
     console.log("--------模拟访问---------");
     try {
       const browser = this.juejin.browser();
@@ -211,7 +211,9 @@ class MockVisitTask extends Task {
       await utils.wait(utils.randomRangeNumber(2000, 5000));
       try {
         await browser.visitPage("/user/center/signin");
+        await browser.visitPage("/user/center/bugfix");
         console.log("掘金每日签到：页面访问成功");
+        console.log("掘金bugfix：页面访问成功");
       } catch (e) {
         console.log("掘金每日签到：页面访问失败");
       }
@@ -232,7 +234,7 @@ class CheckIn {
     this.cookie = cookie;
   }
 
-  async run() {
+  async run () {
     const juejin = new JuejinHelper();
     try {
       await juejin.login(this.cookie);
@@ -243,28 +245,12 @@ class CheckIn {
 
     this.username = juejin.getUser().user_name;
 
-    this.growthTask = new GrowthTask(juejin);
-    this.dipLuckyTask = new DipLuckyTask(juejin);
-    this.lotteriesTask = new LotteriesTask(juejin);
-    this.bugfixTask = new BugfixTask(juejin);
-    this.sdkTask = new SdkTask(juejin);
     this.mockVisitTask = new MockVisitTask(juejin);
 
     await this.mockVisitTask.run();
-    await this.sdkTask.run();
-    console.log(`运行 ${this.growthTask.taskName}`);
-    await this.growthTask.run();
-    console.log(`运行 ${this.dipLuckyTask.taskName}`);
-    await this.dipLuckyTask.run();
-    console.log(`运行 ${this.lotteriesTask.taskName}`);
-    await this.lotteriesTask.run(this.growthTask, this.dipLuckyTask);
-    console.log(`运行 ${this.bugfixTask.taskName}`);
-    await this.bugfixTask.run();
-    await juejin.logout();
-    console.log("-------------------------");
   }
 
-  toString() {
+  toString () {
     const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
       .map(([lottery_id, count]) => {
         const lotteryItem = this.lotteriesTask.lottery.find(item => item.lottery_id === lottery_id);
@@ -275,43 +261,11 @@ class CheckIn {
       })
       .join("\n");
 
-    return `
-掘友: ${this.username}
-${
-  {
-    0: "签到失败",
-    1: `签到成功 +${this.growthTask.incrPoint} 矿石`,
-    2: "今日已完成签到"
-  }[this.growthTask.todayStatus]
-}
-${
-  {
-    0: "沾喜气失败",
-    1: `沾喜气 +${this.dipLuckyTask.dipValue} 幸运值`,
-    2: "今日已经沾过喜气"
-  }[this.dipLuckyTask.dipStatus]
-}
-${
-  this.bugfixTask.bugStatus === 1
-    ? this.bugfixTask.collectBugCount > 0
-      ? `收集Bug +${this.bugfixTask.collectBugCount}`
-      : "没有可收集Bug"
-    : "收集Bug失败"
-}
-连续签到天数 ${this.growthTask.contCount}
-累计签到天数 ${this.growthTask.sumCount}
-当前矿石数 ${this.growthTask.sumPoint}
-当前未消除Bug数量 ${this.bugfixTask.userOwnBug}
-当前幸运值 ${this.dipLuckyTask.luckyValue}/6000
-预测All In矿石累计幸运值比率 ${(this.lotteriesTask.luckyValueProbability * 100).toFixed(2) + "%"}
-抽奖总次数 ${this.lotteriesTask.lotteryCount}
-免费抽奖次数 ${this.lotteriesTask.freeCount}
-${this.lotteriesTask.lotteryCount > 0 ? "==============\n" + drawLotteryHistory + "\n==============" : ""}
-`.trim();
+    return `掘友: ${this.username},访问fixbug页面成功`
   }
 }
 
-async function run(args) {
+async function run (args) {
   const cookies = utils.getUsersCookie(env);
   let messageList = [];
   for (let cookie of cookies) {
